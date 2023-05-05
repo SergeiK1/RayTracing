@@ -1,3 +1,2 @@
 # RayTracing2
-testing out some cool stuff
-again??
+A Visual Guide to Ray Tracing used to aid in teaching
