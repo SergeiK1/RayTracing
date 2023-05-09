@@ -3,26 +3,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 
  
-
-#creates subplots
-figure, axes = plt.subplots()
-axes.set_aspect('equal')
-
-#I put this to set the scale of the plot because otherwise 
-# I cannot see the circle drawn and idk how to change scale on the graph size...
-x = np.array([0, 30])
-print(f"X: {x}")
-y = np.array([0,30])
-print(f"Y: {y}")
-plt.scatter(x,y)
+def circle_contact(circle_x, circle_y, r, ray_x, ray_y):
+       if ((ray_x - circle_x)**2 + (ray_y - circle_y)**2 == r**2):
+        return True;
+       else:
+        return False;
+ 
 
 
-#Draws circle 
-circle = plt.Circle(( 10 , 10 ), 5 )
-axes.add_artist(circle)
+origin = np.array([0, 10,]) # x, y
+
+lenses = [
+    {'center': np.array([100, 10]), 'radius': 10, 'focal': 20},
+    {'center': np.array([200, 10]), 'radius': 10, 'focal': 20}
+]
+
+
+# print(circle_contact(lenses[0]['center'][0],lenses[0]['center'][1],lenses[0]['radius'], 89, 10))
 
 
 
-#Title and Show
-plt.title( 'Circle' )
-plt.show()
+
+
+for i in range(300):
+       print(i)
+       if (circle_contact(lenses[0]['center'][0],lenses[0]['center'][1],lenses[0]['radius'], i, 10)):
+              print("Touching")
+              break
+       else:
+            print(i)
+              
