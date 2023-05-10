@@ -20,22 +20,31 @@ def draw_circle(x,y,r):
    y_res = y + r * np.sin( angle ) 
    axes.plot(x_res, y_res)
 
+def draw_halfcircle(x,y,r):
+   angle = np.linspace( 2*(np.pi)/3 , 4*(np.pi)/3 , 150 ) #not true half circle --> change the numbers around pi to make it truly half 
+   x_res = x + r * np.cos( angle ) 
+   y_res = y + r * np.sin( angle ) 
+   axes.plot(x_res, y_res)
 
-# ------ Lenses --------
+
+# ------ OBJECTS --------
 lenses = [
-    {'center': np.array([4, 3]), 'radius': 2, 'focal': 20},
+    {'center': np.array([15, 3]), 'radius': 3, 'focal': 20},
     {'center': np.array([200, 10]), 'radius': 10, 'focal': 20}
 ]
+origin = np.array([2,3])
 
 
 
 
 
 # ------- Running Code -------
+# draw_circle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
 
-draw_circle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
 
+draw_halfcircle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
 
+axes.scatter(origin[0],origin[1], s=15, c='g')
 
 
 
@@ -45,11 +54,10 @@ draw_circle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
 
 # ------- Plotting --------
 
-plt.axhline(y = 0.1, color = 'r', linestyle = '-')
+plt.axhline(y = 0.03, color = '#000000', linestyle = '-', linewidth=3) #uneecessary line 
 axes.set_aspect( 1 ) 
-axis_size = 10
-plt.xlim( 0 , axis_size )
-plt.ylim( 0 , axis_size ) 
+plt.xlim( 0 , 20 )
+plt.ylim( 0 , 10 ) 
 plt.title('Ray Tracing')
 plt.show()
 
