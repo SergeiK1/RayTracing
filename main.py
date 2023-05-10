@@ -1,4 +1,5 @@
 import matplotlib as mpl
+import matplotlib.animation as animation 
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -27,6 +28,19 @@ def draw_halfcircle(x,y,r):
    axes.plot(x_res, y_res)
 
 
+# fix for the closest interspet (convert to 2d)
+
+# def nearest_intersected_object(objects, ray_origin, ray_direction):
+#     distances = [sphere_intersect(obj['center'], obj['radius'], ray_origin, ray_direction) for obj in objects]
+#     nearest_object = None
+#     min_distance = np.inf
+#     for index, distance in enumerate(distances):
+#         if distance and distance < min_distance:
+#             min_distance = distance
+#             nearest_object = objects[index]
+#     return nearest_object, min_distance
+
+
 # ------ OBJECTS --------
 lenses = [
     {'center': np.array([15, 3]), 'radius': 3, 'focal': 20},
@@ -42,9 +56,9 @@ origin = np.array([2,3])
 # draw_circle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
 
 
-draw_halfcircle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius'])
+draw_halfcircle(lenses[0]['center'][0],lenses[0]['center'][1], lenses[0]['radius']) # lense 1
 
-axes.scatter(origin[0],origin[1], s=15, c='g')
+axes.scatter(origin[0],origin[1], s=15, c='g') # origin 
 
 
 
