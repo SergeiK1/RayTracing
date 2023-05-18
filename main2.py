@@ -9,8 +9,8 @@ import numpy as np
 
 #---------- Subplot ------------
 figure, axes = plt.subplots( 1 ) 
-plot_x_lim = 20
-plot_y_lim = 10
+plot_x_lim = 35
+plot_y_lim = 25
  
 
 
@@ -63,13 +63,29 @@ def draw_lens(lens):
     axes.plot(x_res, y_res)
 
 # ------ OBJECTS --------
+
+
+#----- Lense Number & Origin Number --------
+k = 0 # lense
+o = 3 # origin
+lens_proportion = 4 # what percentage of the lense do the rays cover 
+# --------------------------
+
+
+
 lenses = [
-    {'center': np.array([10, 3]), 'radius': 2, 'focal': 20},
+    {'center': np.array([10, 10]), 'radius': 5, 'focal': 20},
     {'center': np.array([14, 4]), 'radius': 3, 'focal': 20},
-    {'center': np.array([10, 10]), 'radius': 10, 'focal': 20},
-    {'center': np.array([35, 10]), 'radius': 20, 'focal': 20}
+    {'center': np.array([15, 10]), 'radius': 10, 'focal': 20},
+    {'center': np.array([40, 10]), 'radius': 20, 'focal': 20}
 ]
-origin = np.array([2,5])
+origins = [
+    {'center': np.array([5,10])},
+    {'center': np.array([30,10])},
+    {'center': np.array([10,6])},
+    {'center': np.array([20,15])}
+]
+origin = origins[o]['center']
 colors = np.array(['#FFBB74','#FFE874','#E4FF74','#CAFF74', '#ABFF74', '#7FFF74', '#74FFB7','#74FFD1','#74FFF9','#74E6FF','#74CAFF', '#74ADFF', '#7491FF', '#8574FF'])
 
 
@@ -77,13 +93,9 @@ colors = np.array(['#FFBB74','#FFE874','#E4FF74','#CAFF74', '#ABFF74', '#7FFF74'
 
 #------ Running Code --------
 
-#----- Lense Number --------
-k = 1
-# --------------------------
-
 try:
-    range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/3)
-    range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/3)
+    range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/lens_proportion)
+    range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/lens_proportion)
 except:
     range_y1 = 1
     range_y2 = plot_x_lim
@@ -102,7 +114,7 @@ for i in np.linspace(range_y1,range_y2,frequency): # make it in the range of the
     # From origin to the lense
     endpoint = np.array([get_circle_x_coords(lenses[k],i), i])
     direction_ray = normalize(endpoint - origin)
-    draw_line(origin, endpoint, colors[color_pick]) #line conencting to center
+    draw_line(origin, endpoint, '#dbe9ff') #line conencting to center
 
     #From circle center to outlense (normal line)
     circle_endpoint = endpoint
@@ -114,7 +126,7 @@ for i in np.linspace(range_y1,range_y2,frequency): # make it in the range of the
     direction_reflected = reflected(direction_ray, direction_circle_normal)
     x_reflected_coords = []
     y_reflected_coords = []
-    for j in np.linspace(-10,circle_endpoint[0],100): #you can put the bounds as the plot x limits
+    for j in np.linspace(-10,plot_x_lim,100): #you can put the bounds as the plot x limits
         try: 
             new_point_x = circle_endpoint[0] + j*direction_reflected[0]
             new_point_y = circle_endpoint[1] + j*direction_reflected[1]
