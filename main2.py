@@ -35,7 +35,6 @@ def get_circle_x_coords(lens, y_value):
     # print(f"Circle x_coord Input: {h,k,radius,y_value}")
     x_value = np.sqrt(radius**2 - (y_value - k)**2) + h
     x_value2 = h-(x_value-h)
-    print(x_value, x_value2)
     return min(x_value, x_value2)
 
 def draw_line(origin, endpoint, color):
@@ -130,31 +129,19 @@ for i in np.linspace(range_y1,range_y2,frequency): # make it in the range of the
         try: 
             new_point_x = circle_endpoint[0] + j*direction_reflected[0]
             new_point_y = circle_endpoint[1] + j*direction_reflected[1]
-            print(f"New Point X: {new_point_x}")
-            print(f"New Point Y: {new_point_y}")
             x_reflected_coords.append(new_point_x)
             y_reflected_coords.append(new_point_y)
         except:
             continue
-    print('-----------------------')
-    print(f"X Reflected Coords: {x_reflected_coords}")
-    print(f"Y Reflected Coords: {y_reflected_coords}")
-    print('-----------------------')
     plt.plot(x_reflected_coords, y_reflected_coords, linestyle='--', c=colors[color_pick])
+    print(f"Ray: {color_pick}")
     color_pick += 1 #increment to next color 
-    #Tests 
-    print(f"Endpoint: {endpoint}")
-    print(f"Direction: {direction_ray}")
-    print(f"Circle DirectionL {direction_circle_normal}")
-    print(f"Reflected Direction: {direction_reflected}")
-    print(f"Y: {i}")
     
    
 
 
 
 # --- Drawing ----
-print(f"Lense: {lenses[k]}")
 draw_lens(lenses[k]) # Lense
 plt.scatter(origin[0],origin[1],s=15, c='g') #origin
 
