@@ -2,15 +2,34 @@
 import matplotlib as mpl
 import matplotlib.animation as animation 
 import matplotlib.pyplot as plt
-import math
 import numpy as np
 
+
+# Flip lens to get concave 
 
 
 #---------- Subplot ------------
 figure, axes = plt.subplots( 1 ) 
-plot_x_lim = 40
+plot_x_lim = 80
 plot_y_lim = 15
+
+
+lenses = [
+    {'center': np.array([20, 7.5]), 'radius': 10, 'n': 1.3},
+    {'center': np.array([30, 7.5]), 'radius': 10, 'n': 2.5},
+    {'center': np.array([40, 7.5]), 'radius': 10, 'n': 3.5},
+    {'center': np.array([60, 7.5]), 'radius': 10, 'n': 2}
+]
+origins = [
+    {'center': np.array([1,7.5])},
+    {'center': np.array([60,5])},
+    {'center': np.array([30,5])},
+    {'center': np.array([20,15])}
+]
+
+colors = np.array(['#FFBB74','#00ff44','#05dcf0','#0037ff', '#ABFF74', '#a200ff', '#74FFB7','#74FFD1','#74FFF9','#74E6FF','#74CAFF', '#74ADFF', '#7491FF', '#8574FF'])
+
+
  
 
 
@@ -21,6 +40,7 @@ def reflected(vector, axis):
 def refract(direction, normal, n1, n2):
     # Compute the incident angle
     cos_theta1 = -np.dot(direction, normal)
+    
     
     # Check if the ray is entering or exiting the medium
     if cos_theta1 < 0:
@@ -38,8 +58,30 @@ def refract(direction, normal, n1, n2):
     
     # Compute the refracted direction vector
     direction_refracted = (n1 / n2) * direction + (n1 / n2 * cos_theta1 - np.sqrt(1 - sin_theta2**2)) * normal
-    
+    # print("-------------------")
+    # print(f"Cos theta: {cos_theta1}")
+    # print(f"Sin theta: {sin_theta2}")
+    # print(f"Direction: {direction}")
+    # print(f"Normal: {normal}")
+    # print(f"Direction Refracted: {direction_refracted}")
+    # print("-------------------")
     return direction_refracted
+
+def array_equals_values(arr, values):
+    if len(arr) != len(values):
+        return False
+
+    for i in range(len(arr)):
+        if arr[i] != values[i]:
+            return False
+
+    return True
+
+def lens_detection(coords_object, coords_next_lens, accuracy=0.01):
+    if ((abs(coords_object[0] - coords_next_lens[0]) < accuracy)) and ((abs(coords_object[1] - coords_next_lens[1])) < accuracy):
+        return True
+    else:
+        return False
 
 
 def normalize(vector):
@@ -84,7 +126,7 @@ def draw_lens(lens):
     y_res = y + r * np.sin( angle ) 
     axes.plot(x_res, y_res)
 
-def origin_lens_reflection(o, k, frequency, lens_proportion):
+def origin_lens_reflection(origin, k, frequency, lens_proportion, color):
     try:
         range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/lens_proportion)
         range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/lens_proportion)
@@ -92,8 +134,8 @@ def origin_lens_reflection(o, k, frequency, lens_proportion):
         range_y1 = 1
         range_y2 = plot_x_lim
     #defining some constants
-    color_pick = 0
-    origin = origins[o]['center']
+    count = 0
+    # origin = origins[o]['center']
 
     for i in np.linspace(range_y1,range_y2,frequency): # make it in the range of the center of the circle
         # From origin to the lense
@@ -119,9 +161,9 @@ def origin_lens_reflection(o, k, frequency, lens_proportion):
                 y_reflected_coords.append(new_point_y)
             except:
                 continue
-        plt.plot(x_reflected_coords, y_reflected_coords, linestyle='--', c=colors[color_pick])
-        print(f"Ray Reflected #{color_pick}")
-        color_pick += 1 #increment to next color 
+        plt.plot(x_reflected_coords, y_reflected_coords, linestyle='--', c=colors[color])
+        print(f"Ray Reflected #{count}")
+        count += 1 #increment to next count 
         
     
 
@@ -133,7 +175,75 @@ def origin_lens_reflection(o, k, frequency, lens_proportion):
 
     return
 
-def origin_lens_refraction(o, k, frequency,lens_proportion, n1, n2):
+def origin_lens_reflection_givendirection(origin, k, frequency, lens_proportion, color, direction_ray):
+    try:
+        range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/lens_proportion)
+        range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/lens_proportion)
+    except:
+        range_y1 = 1
+        range_y2 = plot_x_lim
+    #defining some constants
+    count = 0
+    # origin = origins[o]['center']
+
+    for i in np.linspace(range_y1,range_y2,frequency): # make it in the range of the center of the circle
+        # From origin to the lense
+        endpoint = np.array([get_circle_x_coords(lenses[k],i), i])
+        # direction_ray = normalize(endpoint - origin)
+        # draw_line(origin, endpoint, '#dbe9ff') #line conencting to center
+
+        #From circle center to outlense (normal line)
+        circle_endpoint = endpoint
+        circle_origin = lenses[k]['center']
+        direction_circle_normal = normalize(circle_endpoint - circle_origin)
+        # draw_line(circle_origin, circle_endpoint)
+
+        #Reflection 
+        direction_reflected = reflected(direction_ray, direction_circle_normal)
+        x_reflected_coords = []
+        y_reflected_coords = []
+        for j in np.linspace(-10,plot_x_lim,100): #you can put the bounds as the plot x limits
+            try: 
+                new_point_x = circle_endpoint[0] + j*direction_reflected[0]
+                new_point_y = circle_endpoint[1] + j*direction_reflected[1]
+                x_reflected_coords.append(new_point_x)
+                y_reflected_coords.append(new_point_y)
+            except:
+                continue
+        plt.plot(x_reflected_coords, y_reflected_coords, linestyle='--', c='r')
+        print(f"Ray Reflected #{count}")
+        count += 1 #increment to next count 
+        
+    
+
+
+
+    # --- Drawing ----
+    draw_lens(lenses[k]) # Lense
+    plt.scatter(origin[0],origin[1],s=15, c='g') #origin
+
+    return
+
+
+
+
+
+
+
+
+# ________------------------______________--------
+
+def origin_lens_refraction(origin, k, frequency,lens_proportion, n1, color):
+     # --- Drawing ----
+    draw_lens(lenses[k]) # Lense
+    plt.scatter(origin[0],origin[1],s=15, c='g') #origin
+
+    try:
+        draw_lens(lenses[k+1])
+    except:
+        pass
+
+
     try:
         range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/lens_proportion)
         range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/lens_proportion)
@@ -141,45 +251,198 @@ def origin_lens_refraction(o, k, frequency,lens_proportion, n1, n2):
         range_y1 = 1
         range_y2 = plot_x_lim
 
+    
+ 
 
     #defining some constants
-    color_pick = 0
-    origin = origins[o]['center']
+    n2 = lenses[k]['n']
+    count = 0
+    new_ray_direction_ar = []
+    new_origin_ar =[]
+    # origin = origins[o]['center']
 
     for i in np.linspace(range_y1,range_y2,frequency): 
         endpoint = np.array([get_circle_x_coords(lenses[k],i), i])
         direction_ray = normalize(endpoint - origin)
-        draw_line(origin, endpoint, '#dbe9ff') #line conencting to center
+        draw_line(origin, endpoint, 'r') #line conencting to center
         #From circle center to outlense (normal line)
         circle_endpoint = endpoint
         circle_origin = lenses[k]['center']
         direction_circle_normal = normalize(circle_endpoint - circle_origin)
         # draw_line(circle_origin, circle_endpoint) 
 
+        try:
+            # print("NEXT ENDPOINT*$&^%^&*(*&^%$%^&*(*&^%$%^&*))")
+            # print(f"lenses[k+1]['center'][0]: {lenses[k+1]['center'][0]}")
+            # print(f"lenses[k+1]['radius']: {lenses[k+1]['radius']}")
+            next_endpoint = ((lenses[k+1]['center'][0]) - (lenses[k+1]['radius']))
+            # print(f"next end point: {next_endpoint}")
+        except:
+            next_endpoint = plot_x_lim
+
         #Refraction 
         direction_refracted = refract(direction_ray, direction_circle_normal, n1, n2)
         x_refracted_coords = []
         y_refracted_coords = []
-        for j in np.linspace(-10,plot_x_lim,100): #you can put the bounds as the plot x limits
+        #if the result is a 0, 0 array then it must be too high to refract so it must REFLECT 
+        for j in np.linspace(0,next_endpoint - (origin[0]-1.5),1000): #you can put the bounds as the plot x limits
             try: 
                 new_point_x = circle_endpoint[0] + j*direction_refracted[0]
                 new_point_y = circle_endpoint[1] + j*direction_refracted[1]
-                x_refracted_coords.append(new_point_x)
-                y_refracted_coords.append(new_point_y)
+                # print("Shift")
+                new_coords = np.array([new_point_x, new_point_y])
+                try:
+                    circle_new_coords = np.array([get_circle_x_coords(lenses[k+1],new_coords[1]), new_coords[1]])
+                    if lens_detection(new_coords, circle_new_coords, 0.01):
+                        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                        # print("new lense detected")
+                        # print(f"New Coord: {new_coords}")
+                        # print(f"K+1: {k+1}")
+                        # print(f"frequency: {frequency}")
+                        # print(f"Lenses[k]['n']: {lenses[k]['n']}")
+                        # print(f"Count: {count}")
+                        # print(f"Pre Direciton Refracted: {direction_refracted}")
+                        # print("^^^^^^^^^^^^^^^^^^^^^^^^^^")
+                        origin_lens_refraction_givendirection(new_coords, (k+1), frequency, lens_proportion, lenses[k]['n'], count, direction_refracted)
+                        
+                    else:
+                        x_refracted_coords.append(new_point_x)
+                        y_refracted_coords.append(new_point_y)
+                        # print("else")
+                    
+                except:
+                    # print("except")
+                    x_refracted_coords.append(new_point_x)
+                    y_refracted_coords.append(new_point_y)
             except:
                 continue
-        plt.plot(x_refracted_coords, y_refracted_coords, linestyle='--', c=colors[color_pick])
-        print(f"Ray Refracted #{color_pick}")
-        color_pick += 1 #increment to next color 
-        
+        plt.plot(x_refracted_coords, y_refracted_coords, linestyle='--', c=colors[color])
+        print(f"Ray Refracted #{count}")
+        count += 1 #increment to next color 
+        new_ray_direction_ar.append(direction_refracted)
+        new_origin_ar.append(endpoint)
 
+
+   
+
+
+
+    return new_ray_direction_ar, new_origin_ar
+
+
+#_---------------------------- Refraction given directio and stuff 
+def origin_lens_refraction_givendirection(origin, k, frequency,lens_proportion, n1, color, direction_ray):
+    
     # --- Drawing ----
     draw_lens(lenses[k]) # Lense
     plt.scatter(origin[0],origin[1],s=15, c='g') #origin
 
+    try:
+        draw_lens(lenses[k+1])
+    except:
+        pass
+    
+    try:
+        range_y1 = lenses[k]['center'][1] - ((lenses[k]['radius'])/lens_proportion)
+        range_y2 = lenses[k]['center'][1] + ((lenses[k]['radius'])/lens_proportion)
+    except:
+        range_y1 = 1
+        range_y2 = plot_x_lim
+    print("RUNNING THE SECOND REFRACTION -----------------------------")
+
+    #defining some constants
+    n2 = lenses[k]['n']
+    count = 0
+    new_ray_direction_ar = []
+    new_origin_ar =[]
+    # origin = origins[o]['center']
+
+    for i in np.linspace(range_y1,range_y2,frequency): 
+        endpoint = origin
+        
+        try:
+            # print("NEXT ENDPOINT*$&^%^&*(*&^%$%^&*(*&^%$%^&*))")
+            # print(f"lenses[k+1]['center'][0]: {lenses[k+1]['center'][0]}")
+            # print(f"lenses[k+1]['radius']: {lenses[k+1]['radius']}")
+            next_endpoint = ((lenses[k+1]['center'][0]) - (lenses[k+1]['radius']))
+            # print(f"next end point: {next_endpoint}")
+        except:
+            next_endpoint = plot_x_lim
+
+        # direction_ray = normalize(endpoint - origin)
+        # draw_line(origin, endpoint, '#dbe9ff') #line conencting to center
+        #From circle center to outlense (normal line)
+        # circle_endpoint = origin
+        circle_origin = lenses[k]['center']
+        
+        direction_circle_normal = normalize(origin - circle_origin)
+        # draw_line(circle_origin, circle_endpoint) 
+
+        #Refraction 
+        direction_refracted = refract(direction_ray, direction_circle_normal, n1, n2) # ISSUE HERE IM PRETTY SURE THIS IS PRODUCING ZEROS 
+        x_refracted_coords = []
+        y_refracted_coords = []
+        # print("************************")
+        # print(f"Origin: {origin}")
+        # print(f"Circle Origin: {circle_origin}")
+        # print(f"Direction Circle Normal: {direction_circle_normal}")
+        # print("0---0")
+        # print(f"Directon Ray: {direction_ray}")
+        # print(f"N1: {n1}, N2: {n2}")
+        # print(f"Direction Refracted: {direction_refracted}") ## --> For some reason 0, 0 !!!!!!!
+        # print("************************")
+        
+        zero_array= np.array([0,0])
+        if array_equals_values(direction_refracted, zero_array):
+            print("!!!!!!!!!!REFLECT!!!!!!!!!!!!!!")
+            # origin_lens_reflection_givendirection(origin, k, frequency, lens_proportion, color, direction_ray)
+            #FIX REFLECTION
 
 
-    return
+        for j in np.linspace(0,next_endpoint-(origin[0]-2),1000): #!!!!!!FIX ENDPOITNS TO DRAW ONLY TO THE NEXT LENSE
+            try: 
+                new_point_x = origin[0] + j*direction_refracted[0]
+                new_point_y = origin[1] + j*direction_refracted[1]
+                
+                # print("Shift")
+                new_coords = np.array([new_point_x, new_point_y])
+                # print(f"New Coords: {new_coords}")
+                try:
+                    circle_new_coords = np.array([get_circle_x_coords(lenses[k+1],new_coords[1]), new_coords[1]])
+                    if lens_detection(new_coords, circle_new_coords, 0.01):
+                        # print(f"New Coord: {new_coords}")
+                        # print(f"K+1: {k+1}")
+                        # print(f"frequency: {frequency}")
+                        # print(f"Lenses[k+1]['n']: {lenses[k+1]['n']}")
+                        # print(f"Count: {count}")
+                        color += 1
+                        origin_lens_refraction_givendirection(new_coords, (k+1), frequency, lens_proportion, lenses[k]['n'], count, direction_refracted)
+                        print("new lense detected")
+                    else:
+                        x_refracted_coords.append(new_point_x)
+                        y_refracted_coords.append(new_point_y)
+                        # print("else")
+                    
+                except:
+                    # print("except")
+                    x_refracted_coords.append(new_point_x)
+                    y_refracted_coords.append(new_point_y)
+            except:
+                continue
+        plt.plot(x_refracted_coords, y_refracted_coords, linestyle='dashdot', c=colors[color])
+        print(f"Ray Refracted #{count}")
+        count += 1 #increment to next color 
+        new_ray_direction_ar.append(direction_refracted)
+        new_origin_ar.append(endpoint)
+
+
+    
+
+
+
+    return new_ray_direction_ar, new_origin_ar
+
+
 
 # ------ OBJECTS --------
 
@@ -192,32 +455,29 @@ def origin_lens_refraction(o, k, frequency,lens_proportion, n1, n2):
 
 
 
-lenses = [
-    {'center': np.array([15, 5]), 'radius': 3, 'focal': 20},
-    {'center': np.array([6, 5]), 'radius': 5, 'focal': 20},
-    {'center': np.array([20, 5]), 'radius': 10, 'focal': 20},
-    {'center': np.array([40, 10]), 'radius': 20, 'focal': 20}
-]
-origins = [
-    {'center': np.array([3,5])},
-    {'center': np.array([15,5])},
-    {'center': np.array([30,5])},
-    {'center': np.array([20,15])}
-]
-
-colors = np.array(['#FFBB74','#FFE874','#E4FF74','#CAFF74', '#ABFF74', '#7FFF74', '#74FFB7','#74FFD1','#74FFF9','#74E6FF','#74CAFF', '#74ADFF', '#7491FF', '#8574FF'])
-
 
 
 
 #------------ Running Reflection --------------
-# origin_lens_reflection(0, 0, 10, 2)  # convex reflection
-# origin_lens_reflection(1, 1, 10, 2)    # concave reflection
-
+# origin_lens_reflection(origins[0]['center'], 0, 10, 2, 3)  # convex reflection
+# origin_lens_reflection(origins[1]['center'], 0, 10, 2, 3)    # concave reflection
+#for concave just have the input coordinatres swithc to flip the lense 
 
 #------------ Running Refraction --------------
-# origin_lens_refraction(0, 0, 10, 4, 1, 2)
-origin_lens_refraction(0, 0, 10, 4, 1, 10)
+origin_lens_refraction(origins[0]['center'], 0, 5, 3, 1, 3 ) # good example 
+
+
+
+
+
+#----------------- INPUT FIELDS AND STUFF -----------------------
+
+
+
+
+
+
+
 
 # ------- Plotting --------
 
