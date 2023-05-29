@@ -14,18 +14,23 @@ plot_x_lim = 80
 plot_y_lim = 15
 
 
-lenses = [
-    {'center': np.array([20, 7.5]), 'radius': 10, 'n': 1.3},
-    {'center': np.array([30, 7.5]), 'radius': 10, 'n': 2.5},
-    {'center': np.array([40, 7.5]), 'radius': 10, 'n': 3.5},
-    {'center': np.array([60, 7.5]), 'radius': 10, 'n': 2}
-]
-origins = [
-    {'center': np.array([1,7.5])},
-    {'center': np.array([60,5])},
-    {'center': np.array([30,5])},
-    {'center': np.array([20,15])}
-]
+
+
+
+
+
+# lenses = [
+#     {'center': np.array([20, 7.5]), 'radius': 10, 'n': 1.3},
+#     {'center': np.array([30, 7.5]), 'radius': 10, 'n': 2.5},
+#     {'center': np.array([40, 7.5]), 'radius': 10, 'n': 3.5},
+#     {'center': np.array([60, 7.5]), 'radius': 10, 'n': 2}
+# ]
+# origins = [
+#     {'center': np.array([1,7.5])},
+#     {'center': np.array([60,5])},
+#     {'center': np.array([30,5])},
+#     {'center': np.array([20,15])}
+# ]
 
 colors = np.array(['#FFBB74','#00ff44','#05dcf0','#0037ff', '#ABFF74', '#a200ff', '#74FFB7','#74FFD1','#74FFF9','#74E6FF','#74CAFF', '#74ADFF', '#7491FF', '#8574FF'])
 
@@ -348,7 +353,7 @@ def origin_lens_refraction_givendirection(origin, k, frequency,lens_proportion, 
     except:
         range_y1 = 1
         range_y2 = plot_x_lim
-    print("RUNNING THE SECOND REFRACTION -----------------------------")
+    # print("RUNNING THE SECOND REFRACTION -----------------------------")
 
     #defining some constants
     n2 = lenses[k]['n']
@@ -417,7 +422,7 @@ def origin_lens_refraction_givendirection(origin, k, frequency,lens_proportion, 
                         # print(f"Count: {count}")
                         color += 1
                         origin_lens_refraction_givendirection(new_coords, (k+1), frequency, lens_proportion, lenses[k]['n'], count, direction_refracted)
-                        print("new lense detected")
+                        # print("new lense detected")
                     else:
                         x_refracted_coords.append(new_point_x)
                         y_refracted_coords.append(new_point_y)
@@ -459,22 +464,128 @@ def origin_lens_refraction_givendirection(origin, k, frequency,lens_proportion, 
 
 
 #------------ Running Reflection --------------
-# origin_lens_reflection(origins[0]['center'], 0, 10, 2, 3)  # convex reflection
+# lenses = [
+#     {
+#         'center': np.array([40, 7.5]), 
+#         'radius': 10, 
+#         # 'n': 1.3
+#         }
+# ]
+# origin_test = np.array([2, 5])
+
+
+# origin_lens_reflection(origin_test, 0, 10, 2, 3)  # convex reflection
 # origin_lens_reflection(origins[1]['center'], 0, 10, 2, 3)    # concave reflection
 #for concave just have the input coordinatres swithc to flip the lense 
 
 #------------ Running Refraction --------------
-origin_lens_refraction(origins[0]['center'], 0, 5, 3, 1, 3 ) # good example 
 
-
+# origin_lens_refraction(origins[0]['center'], 0, 5, 3, 1, 3 ) # good example 
 
 
 
 #----------------- INPUT FIELDS AND STUFF -----------------------
 
+inputting = True
+lenses = []
+while inputting:
+    reflect_refract = int(input("Would you like to Reflect (0) or Refract (1): "))
+    if reflect_refract == 0:
+        print("\n----------------------------- REFLECTING -----------------------------")
+        print("---- Origin ----")
+        new_origin_center_x = float(input("New Origin Coordinate X: "))
+        new_origin_center_y = float(input("New Origin Coordinate Y: "))
+        print("\n---- Lens ----")
+        bigger = True
+        while bigger:
+            new_lens_center_x = float(input("New Lense Coordinate X: "))
+            try:
+                if new_lens_center_x <= new_origin_center_x:
+                    print("!!! The lens must be on the right side of the origin")
+                    continue
+                else:
+                    bigger = False
+                    pass
+
+            except:
+                bigger = False
+                pass
+        new_lens_center_y = float(input("New Lens Coordinate Y: "))
+        new_lens_radius = float(input("New Lens Radius: "))
+
+        print("\n---- Concavity ----")
+        convex_concave = int(input("Convex (0)  Concave (1): "))
+    
+        if convex_concave == 1:
+            new_lens_center_x = plot_x_lim - new_lens_center_x
+            new_origin_center_x = plot_x_lim - new_origin_center_x
+            
+        new_origin_center = np.array([new_origin_center_x, new_origin_center_y])
+
+        lenses = [
+            {
+                'center': np.array([new_lens_center_x, new_lens_center_y]), 
+                'radius': new_lens_radius
+             
+             }
+        ]
+        origin_lens_reflection(new_origin_center, 0, 10, 2, 3)  # convex reflection
+        inputting = False
+        break
+    elif reflect_refract == 1: 
+
+        inputting_lenses = 'y'
+        counter = 0
+
+        print("\n----------------------------- REFRACTING -----------------------------")
+        print("---- Origin ----")
+        new_origin_center_x = float(input("New Origin Coordinate X: "))
+        new_origin_center_y = float(input("New Origin Coordinate Y: "))
+        new_origin_center = np.array([new_origin_center_x, new_origin_center_y])
+        print("\n---- Lens ----")
+        while inputting_lenses == 'y':
+            print(f"\nLens #{counter}")
+    
+            bigger = True
+            while bigger:
+                new_lens_center_x = float(input("New Lense Coordinate X: "))
+                try:
+                    if new_lens_center_x <= (lenses[counter - 1]['center'][0]+((lenses[counter - 1]['radius'])/2)) -1:
+                        print("!!! The new lens must be farther than the previous lens")
+                        continue
+                    else:
+                        bigger = False
+                        pass
+
+                except:
+                    bigger = False
+                    pass
+
+            new_lens_center_y = float(input("New Lense Coordinate Y: "))
+            new_lens_radius = float(input("New Lense Radius: "))
+            new_lens_refraction_index = float(input("New Lense Refraction Index: "))
+
+            counter += 1
+            
+            lenses.append(
+                {
+                    'center': np.array([new_lens_center_x, new_lens_center_y]), 
+                    'radius': new_lens_radius,
+                    'n': new_lens_refraction_index
+                },
+                )
+            inputting_lenses = input("Continue? y / n: ")
+        origin_lens_refraction(new_origin_center, 0, 5, 3, 1, 3 )
+        inputting = False
+        break
+    else: 
+        print("Please Select 0 or 1")
+        continue
 
 
 
+
+# IFFF IT ERRRORS TRY RESIZING WINDOW !!!!!! 
 
 
 
