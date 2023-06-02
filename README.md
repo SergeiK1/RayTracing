@@ -36,12 +36,12 @@ Lenses
 
 # Good Test for Reflection (Geometric)
 Origins 
-1. Center: 5, 13
+1. Center: 5, 7
 
 
 Lenses
-1. Center: 70, 13  --
-    Radius:  15
+1. Center: 50, 7  --
+    Radius:  10
 
 # Good test for Refraction (Geometric):
 

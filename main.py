@@ -493,7 +493,7 @@ class objects:
 #----------------- INPUT FIELDS AND STUFF -----------------------
 
 
-pick = str(input("Algebraic (a) or geometric (g): "))
+pick = str(input("Algebraic (a) or Geometric (g): "))
 
 
 if pick == "g":
