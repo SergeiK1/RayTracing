@@ -548,7 +548,22 @@ while inputting:
     
             bigger = True
             while bigger:
-                new_lens_center_x = float(input("New Lense Coordinate X: "))
+                bigger2 = True
+                while bigger2:
+                    new_lens_center_x = float(input("New Lense Coordinate X: "))
+                    try:
+                        if new_lens_center_x <= new_origin_center_x:
+                            print("!!! The lens must be on the right side of the origin")
+                            continue
+                        else:
+                            bigger2 = False
+                            pass
+
+                    except:
+                        bigger2 = False
+                        pass
+
+                # new_lens_center_x = float(input("New Lense Coordinate X: "))
                 try:
                     if new_lens_center_x <= (lenses[counter - 1]['center'][0]+((lenses[counter - 1]['radius'])/2)) -1:
                         print("!!! The new lens must be farther than the previous lens")
