@@ -9,6 +9,9 @@ figure, axes = plt.subplots( 1 )
 plot_x_lim = 80
 plot_y_lim = 15
 
+xbound = 600
+ybound = 75
+
 
 
 colors = np.array(['#FFBB74','#00ff44','#05dcf0','#0037ff', '#ABFF74', '#a200ff', '#74FFB7','#74FFD1','#74FFF9','#74E6FF','#74CAFF', '#74ADFF', '#7491FF', '#8574FF'])
@@ -591,7 +594,7 @@ if pick == "g":
 
                 counter += 1
                 
-                lensi.append(
+                lenses.append(
                     {
                         'center': np.array([new_lens_center_x, new_lens_center_y]), 
                         'radius': new_lens_radius,
@@ -706,8 +709,7 @@ elif pick == "a":
         except:
             print('Error: Please Enter a Numerical Y-Coordinate')
 
-    xbound = 600
-    ybound = 150
+
     lens1 = lens(20, 40)
     obj1 = objects([obj1_x, obj1_y])
     draw_circle(obj1_x, obj1_y,5,"black")
