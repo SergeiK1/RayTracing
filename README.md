@@ -6,11 +6,21 @@ IF CODE DOESN'T SHOW RESIZE YOUR WINDOW
 
 # Good test for refraction:
 
-lenses = [
-    {'center': np.array([20, 7.5]), 'radius': 10, 'n': 1.3},
-    {'center': np.array([30, 7.5]), 'radius': 10, 'n': 2.5},
-    {'center': np.array([40, 7.5]), 'radius': 10, 'n': 3.5},
-    {'center': np.array([60, 7.5]), 'radius': 10, 'n': 2}
-]
-origins = [
-    {'center': np.array([1,7.5])},
+lenses
+1. Center: 20, 7.5
+    Radius:  10
+    n: 1.3
+
+2. Center: 30, 7.5
+    Radius: 10
+    n: 2.5
+3. Center: 40, 7.5
+    Radius 10
+    n: 3.5
+
+4. 60, 7.5 
+    Radius: 10
+    n: 2
+
+origins 
+1. Center: 1, 7.5
